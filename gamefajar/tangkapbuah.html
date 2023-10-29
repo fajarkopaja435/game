@@ -1,0 +1,140 @@
+<html>
+<head>
+    <style>
+        #canvas {
+            border: 1px solid black;
+            margin: 10px;
+        }
+        #score {
+            font-size: 20px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Skor: 0</div>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script>
+        // Mendapatkan elemen canvas dan konteks
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        // Mendefinisikan variabel untuk game
+        var basket = {x: 200, y: 350, width: 50, height: 10}; // Objek untuk bakul
+        var fruits = []; // Array untuk menyimpan buah-buah yang jatuh
+        var colors = ["red", "orange", "yellow", "green", "blue", "purple"]; // Array untuk warna buah
+        var score = 0; // Variabel untuk skor
+        var gameOver = false; // Variabel untuk kondisi akhir game
+
+        // Fungsi untuk menggambar bakul pada canvas
+        function drawBasket() {
+            ctx.fillStyle = "brown";
+            ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
+        }
+
+        // Fungsi untuk menggambar buah pada canvas
+        function drawFruit(fruit) {
+            ctx.fillStyle = fruit.color;
+            ctx.beginPath();
+            ctx.arc(fruit.x, fruit.y, fruit.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Fungsi untuk menggerakkan bakul sesuai dengan mouse
+        function moveBasket(event) {
+            var mouseX = event.clientX - canvas.offsetLeft; // Mendapatkan posisi x mouse relatif terhadap canvas
+            if (mouseX >= 0 && mouseX <= canvas.width - basket.width) { // Jika mouse berada di dalam canvas
+                basket.x = mouseX; // Mengubah posisi x bakul sesuai dengan mouse
+            }
+        }
+
+        // Fungsi untuk menambahkan buah baru secara acak
+        function addFruit() {
+            var fruit = {}; // Membuat objek buah kosong
+            fruit.x = Math.floor(Math.random() * (canvas.width - 20)) + 5; // Memberikan nilai x acak antara 10 dan lebar canvas - 10
+            fruit.y = -10; // Memberikan nilai y awal -10 agar buah muncul dari atas canvas
+            fruit.radius = 10; // Memberikan nilai radius 10
+            fruit.color = colors[Math.floor(Math.random() * colors.length)]; // Memberikan warna acak dari array warna
+            fruit.speed = Math.floor(Math.random() * 2) + 1; // Memberikan kecepatan jatuh acak antara 1 dan 5
+            fruits.push(fruit); // Menambahkan buah ke array fruits
+        }
+
+        // Fungsi untuk menggerakkan buah ke bawah sesuai dengan kecepatannya
+        function moveFruit(fruit) {
+            fruit.y += fruit.speed;
+        }
+
+        // Fungsi untuk mengecek apakah buah tertangkap oleh bakul atau tidak
+        function checkCatch(fruit) {
+            if (fruit.y + fruit.radius >= basket.y && fruit.y + fruit.radius <= basket.y + basket.height) { // Jika buah menyentuh bagian atas atau bawah bakul
+                if (fruit.x >= basket.x && fruit.x <= basket.x + basket.width) { // Jika buah menyentuh bagian kiri atau kanan bakul
+                    return true; // Kembalikan nilai true (tertangkap)
+                }
+            }
+            return false; // Kembalikan nilai false (tidak tertangkap)
+        }
+
+        // Fungsi untuk mengecek apakah buah keluar dari canvas atau tidak
+        function checkOut(fruit) {
+            if (fruit.y - fruit.radius > canvas.height) { // Jika buah melewati batas bawah canvas
+                return true; // Kembalikan nilai true (keluar)
+            }
+            return false; // Kembalikan nilai false (masih di dalam)
+        }
+
+        // Fungsi untuk menghapus buah dari array fruits berdasarkan indeksnya
+        function removeFruit(index) {
+            fruits.splice(index, 1);
+        }
+
+        // Fungsi untuk mengupdate skor pada elemen div
+        function updateScore() {
+            var scoreDiv = document.getElementById("score");
+            scoreDiv.innerHTML = "Skor: " + score;
+        }
+
+        // Fungsi untuk mengakhiri game dan menampilkan pesan
+        function endGame() {
+            gameOver = true; // Mengubah variabel gameOver menjadi true
+            ctx.fillStyle = "black";
+            ctx.font = "30px Arial";
+            ctx.fillText("Game Over", 130, 200); // Menulis teks "Game Over" pada canvas
+            ctx.font = "15px Arial";
+            ctx.fillText("Skor Anda: " + score, 150, 200); // Menulis skor pada canvas
+        }
+
+        // Fungsi untuk menjalankan game
+        function runGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Membersihkan canvas
+            drawBasket(); // Menggambar bakul
+            for (var i = 0; i < fruits.length; i++) { // Melakukan perulangan untuk setiap buah di array fruits
+                var fruit = fruits[i]; // Mendapatkan buah ke-i
+                drawFruit(fruit); // Menggambar buah
+                moveFruit(fruit); // Menggerakkan buah
+                if (checkCatch(fruit)) { // Jika buah tertangkap oleh bakul
+                    score++; // Menambahkan skor
+                    updateScore(); // Mengupdate skor
+                    removeFruit(i); // Menghapus buah dari array fruits
+                    i--; // Mengurangi nilai i agar tidak melewatkan buah selanjutnya
+                } else if (checkOut(fruit)) { // Jika buah keluar dari canvas
+                    endGame(); // Mengakhiri game
+                    return; // Keluar dari fungsi runGame
+                }
+            }
+            if (Math.random() < 0.013) { // Dengan probabilitas 5%
+                addFruit(); // Menambahkan buah baru
+            }
+            if (!gameOver) { // Jika game belum berakhir
+                requestAnimationFrame(runGame); // Memanggil fungsi runGame lagi dengan animasi frame
+            }
+        }
+
+        // Menambahkan event listener untuk mousemove pada canvas
+       
+        canvas.addEventListener("mousemove", moveBasket);
+
+        // Memulai game dengan memanggil fungsi runGame
+        runGame();
+    </script>
+</body>
+</html>

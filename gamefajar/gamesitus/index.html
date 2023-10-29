@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas</title>
+  </head>
+  <body>
+    <canvas id="World" width="500" height="500" style="border: 1px solid black"></canvas>
+
+    <script>
+      // Inisialisasi Canvas
+      let canvas = document.getElementById('World');
+      let context = canvas.getContext('2d');
+
+      function createRect(x, y) {
+        context.fillStyle = 'orange';
+        context.fillRect(x, y, 100, 30);
+        context.fillStyle = 'black';
+        context.strokeRect(x, y, 100, 30);
+      }
+      let xStart = canvas.width / 2 - 50;
+      let yStart = canvas.height - 30;
+      let vStart = 30;
+      let fps = 30;
+
+      createRect(xStart, yStart);
+
+      window.addEventListener('keypress', function () {
+        if (event.key == 'a' || event.key == 'A') {
+          if (xStart >= 0) {
+            xStart = xStart - vStart;
+            let xMotion
+            createRect(xMotion,yStart,100,30);
+            console.log(
+            xMotion,
+            vStart,)
+          }
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          createRect(xStart, yStart);
+        }
+        if (event.key == 'd' || event.key == 'D') {
+          if (xStart <= canvas.width - 100) {
+            xStart = xStart + vStart;
+          }
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          createRect(xStart, yStart);
+        }
+        // if (event.key == 'w' || event.key == 'W') {
+        //   yStart = yStart - vStart;
+        //   context.clearRect(0, 0, canvas.width, canvas.height);
+        //   createRect(xStart, yStart);
+        // }
+        // if (event.key == 's' || event.key == 'S') {
+        //   yStart = yStart + vStart;
+        //   context.clearRect(0, 0, canvas.width, canvas.height);
+        //   createRect(xStart, yStart);
+        // }
+      });
+
+      // Membuat FPS Animation
+      yBuah = 0;
+      window.setInterval(function () {
+        context.clearRect(0, 0, canvas.width, canvas.height - 30);
+
+        yBuah = yBuah + 10;
+        if (yBuah <= canvas.height - 90) {
+          createRect(canvas.width / 2 - 25, yBuah, 50, 50);
+        }
+      }, 1000 / fps);
+
+      function mantul() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        xStart = xStart - vStart;
+        yStart = yStart + vStart;
+
+        let xMotion = xStart;
+        let yMotion = yStart;
+
+        if (xMotion <= 0 || yMotion <= 0) {
+          vStart = vStart * -1;
+        }
+        // if (yMotion <= 0) {
+        //     yStart = yStart - vStart;
+        // }
+
+        createRect(xMotion, yMotion);
+
+        context.fillText(x ,xMotion, y ,yMotion, canvas.width / 2 - 30, canva.height - 20);
+      }
+    </script>
+  </body>
+</html>
